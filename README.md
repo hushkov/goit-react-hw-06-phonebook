@@ -1,1 +1,1 @@
-# GoIT Homework 03 Phonebook 📚
+# GoIT Homework 06 Phonebook 📚
