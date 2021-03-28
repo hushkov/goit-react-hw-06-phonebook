@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import s from 'Components/ContactForm/ContactForm.module.css';
+
+import actions from '../../redux/contacts/contacts-actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -17,12 +20,25 @@ class ContactForm extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.onSubmit(this.state);
-    this.reset();
+
+    if (this.preventSimilar(this.state.name)) {
+      alert(`${this.state.name} is already in contacts^^`);
+    } else {
+      this.props.onAddContact(this.state);
+
+      this.reset();
+    }
   };
 
   reset = () => {
     this.setState({ ...INITIAL_STATE });
+  };
+
+  preventSimilar = newContactName => {
+    const { contacts } = this.props;
+    const normalizedName = newContactName.toLowerCase();
+
+    return contacts.find(({ name }) => name.toLowerCase().includes(normalizedName));
   };
 
   render() {
@@ -57,8 +73,12 @@ class ContactForm extends Component {
   }
 }
 
-ContactForm.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
+const MapStateToProps = state => ({
+  contacts: state.contacts.items,
+});
 
-export default ContactForm;
+const MapDispatchToProps = dispatch => ({
+  onAddContact: data => dispatch(actions.addContact(data)),
+});
+
+export default connect(MapStateToProps, MapDispatchToProps)(ContactForm);
